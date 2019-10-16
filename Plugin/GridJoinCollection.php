@@ -3,21 +3,27 @@ namespace Magenest\Grids\Plugin;
 
 use Magento\Framework\Message\ManagerInterface as MessageManager;
 use Magento\Sales\Model\ResourceModel\Order\Grid\Collection as SalesOrderGridCollection;
+use Magento\Customer\Model\ResourceModel\Grid\Collection as CustomerGridCollection;
 use Magento\Framework\View\Element\UiComponent\DataProvider\CollectionFactory;
 
-class OrderGridJoinCollection
+class GridJoinCollection
 {
     private $messageManager;
-    private $collection;
+
+    private $salesorderCollection;
+
+    private $customerCollection;
 
     public function __construct
     (
         MessageManager $messageManager,
-        SalesOrderGridCollection $collection
+        SalesOrderGridCollection $salesorderCollection,
+        CustomerGridCollection $customerCollection
     ) {
 
         $this->messageManager = $messageManager;
-        $this->collection = $collection;
+        $this->salesorderCollection = $salesorderCollection;
+        $this->customerCollection = $customerCollection;
     }
 
     public function aroundGetReport(
@@ -27,28 +33,28 @@ class OrderGridJoinCollection
     ) {
         $result = $proceed($requestName);
         if ($requestName == 'sales_order_grid_data_source') {
-            if ($result instanceof $this->collection
+            if ($result instanceof $this->salesorderCollection
             ) {
-                $select = $this->collection->getSelect();
+                $select = $this->salesorderCollection->getSelect();
                 $select->joinLeft(
-                    ["secondTable" => $this->collection->getTable("magenest_custom_column")],
+                    ["secondTable" => $this->salesorderCollection->getTable("magenest_custom_column")],
                     'main_table.increment_id = secondTable.id',
                     array('custom_column')
                 );
-                return $this->collection;
+                return $this->salesorderCollection;
             }
         }
         elseif($requestName == 'customer_listing_data_source')
         {
-            if ($result instanceof $this->collection
+            if ($result instanceof $this->customerCollection
             ) {
-                $select = $this->collection->getSelect();
+                $select = $this->customerCollection->getSelect();
                 $select->joinLeft(
-                    ["secondTable" => $this->collection->getTable("magenest_custom_column")],
-                    'main_table.increment_id = secondTable.id',
+                    ["secondTable" => $this->customerCollection->getTable("magenest_custom_column")],
+                    'main_table.entity_id = secondTable.id',
                     array('custom_column')
                 );
-                return $this->collection;
+                return $this->customerCollection;
             }
         }
         return $result;

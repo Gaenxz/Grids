@@ -1,15 +1,18 @@
 <?xml version="1.0"?>
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
     <type name="Magento\Framework\View\Element\UiComponent\DataProvider\CollectionFactory">
-        <plugin name="sales_order_grid_custom_column" type="Magenest\Grids\Plugin\OrderGridJoinCollection" sortOrder="5" />
+        <plugin name="grid_custom_column" type="Magenest\Grids\Plugin\GridJoinCollection" sortOrder="5" />
     </type>
 
     <type name="Magento\Catalog\Ui\DataProvider\Product\ProductDataProvider">
         <arguments>
-            <argument name="addFieldStrategies" xsi:type="array">
-                <item name="custom_column" xsi:type="object">Magenest\Grids\Ui\DataProvider\Product\CustomColumn</item>
-            </argument>
+            <argument name="collectionFactory" xsi:type="object">produdct_grids</argument>
         </arguments>
     </type>
 
+    <virtualType name="produdct_grids" type="Magento\Catalog\Model\ResourceModel\Product\CollectionFactory">
+        <arguments>
+            <argument name="instanceName" xsi:type="string">\Magenest\Grids\Model\Grid\JoinProductCollection</argument>
+        </arguments>
+    </virtualType>
 </config>
