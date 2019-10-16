@@ -38,6 +38,19 @@ class OrderGridJoinCollection
                 return $this->collection;
             }
         }
+        elseif($requestName == 'customer_listing_data_source')
+        {
+            if ($result instanceof $this->collection
+            ) {
+                $select = $this->collection->getSelect();
+                $select->joinLeft(
+                    ["secondTable" => $this->collection->getTable("magenest_custom_column")],
+                    'main_table.increment_id = secondTable.id',
+                    array('custom_column')
+                );
+                return $this->collection;
+            }
+        }
         return $result;
     }
 }
