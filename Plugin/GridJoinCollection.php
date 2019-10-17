@@ -26,36 +26,30 @@ class GridJoinCollection
         $this->customerCollection = $customerCollection;
     }
 
-    public function aroundGetReport(
+    public function afterGetReport(
         CollectionFactory $subject,
-        \Closure $proceed,
+        $collection,
         $requestName
     ) {
-        $result = $proceed($requestName);
+        $result = $requestName;
         if ($requestName == 'sales_order_grid_data_source') {
-            if ($result instanceof $this->salesorderCollection
-            ) {
-                $select = $this->salesorderCollection->getSelect();
+                $select = $collection->getSelect();
                 $select->joinLeft(
-                    ["secondTable" => $this->salesorderCollection->getTable("magenest_custom_column")],
+                    ["secondTable" => $collection->getTable("magenest_custom_column")],
                     'main_table.increment_id = secondTable.id',
                     array('custom_column')
                 );
-                return $this->salesorderCollection;
-            }
+                return $collection;
         }
         elseif($requestName == 'customer_listing_data_source')
         {
-            if ($result instanceof $this->customerCollection
-            ) {
-                $select = $this->customerCollection->getSelect();
-                $select->joinLeft(
-                    ["secondTable" => $this->customerCollection->getTable("magenest_custom_column")],
-                    'main_table.entity_id = secondTable.id',
-                    array('custom_column')
-                );
-                return $this->customerCollection;
-            }
+            $select = $collection->getSelect();
+            $select->joinLeft(
+                ["secondTable" => $collection->getTable("magenest_custom_column")],
+                'main_table.entity_id = secondTable.id',
+                array('custom_column')
+            );
+            return $collection;
         }
         return $result;
     }
